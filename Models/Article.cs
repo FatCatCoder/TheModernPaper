@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,6 +9,7 @@ namespace ModernPaper.Models
     public class Article
     {
         [Required]
+        [Key]
         public Guid Id { get; set; }
 
         [Required]
@@ -24,17 +26,17 @@ namespace ModernPaper.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
-        public List<string> Keywords { get; set; }
+        //public List<string> Keywords { get; set; }
 
         [Required]
         public string Content { get; set; }
 
-        public Article(string title, Guid userId, List<string> keywords, string content)
-        {
-            Title = title;
-            UserId = userId;
-            Keywords = keywords;
-            Content = content;
-        } 
+        // public Article(string title, Guid userId, List<string> keywords, string content)
+        // {
+        //     Title = title;
+        //     UserId = userId;
+        //     Keywords = keywords;
+        //     Content = content;
+        // } 
     }       
 }

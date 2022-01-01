@@ -17,19 +17,19 @@ namespace ModernPaper.Models
         public string Email { get; set; }
 
         [Required]
-        private string Password { get; set; }
+        public string Password { get; set; }
 
         [Required]
         public bool Pro { get; set; }
 
         public ICollection<Article>? Articles { get; set; }
 
-        public User(string name, string email, string password, bool pro)
-        {
-            Name = name;
-            Email = email;
-            Password = password;
-            Pro = Pro;
-        } 
+        // public User(string name, string email, string password, bool pro)
+        // {
+        //     Name = name;
+        //     Email = email;
+        //     Password = password;
+        //     Pro = Pro;
+        // } 
     }      
 }
