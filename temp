@@ -1,0 +1,1 @@
+dotnet aspnet-codegenerator controller -name ArticlesController -async -api -m Article -dc ApplicationDbContext -outDir Controllers

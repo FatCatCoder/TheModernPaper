@@ -7,8 +7,11 @@ using ModernPaper.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseInMemoryDatabase("TodoList"));
+
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(DbContextOptions =>
+    DbContextOptions.UseNpgsql("Server=localhost;Port=5432;Database=ModernPaper;User Id=postgres;"));
+  //DbContextOptions.UseInMemoryDatabase("TodoList"));
 
 builder.Services.AddScoped<ArticleService>();
 
@@ -17,11 +20,14 @@ builder.Services.AddControllers();
 // builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     // app.UseSwagger();
     // app.UseSwaggerUI();
 }
