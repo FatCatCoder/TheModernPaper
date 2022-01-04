@@ -3,15 +3,15 @@ using ModernPaper.Contexts;
 using ModernPaper.Models;
 using ModernPaper.Services;
 using ModernPaper.Data;
+using Microsoft.AspNetCore.HttpLogging;
 
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
 // CORS
 builder.Services.AddCors(options =>
@@ -23,19 +23,34 @@ builder.Services.AddCors(options =>
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(DbContextOptions =>
     DbContextOptions.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQLConnection")));
-    // DbContextOptions.UseNpgsql("Server=localhost;Port=5432;Database=ModernPaper;User Id=postgres;"));
-  //DbContextOptions.UseInMemoryDatabase("TodoList"));
 
-builder.Services.AddScoped<ArticleService>();
+// builder.Services.AddScoped<ArticleService>();
 
 // Controllers
 builder.Services.AddControllers()
-.AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
+// cache
+builder.Services.AddDistributedMemoryCache();
 
+// cookies
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// logging
+builder.Services.AddHttpLogging(logging =>
+    {
+        logging.LoggingFields = HttpLoggingFields.All;
+        logging.RequestHeaders.Add("My-Request-Header");
+        logging.ResponseHeaders.Add("My-Response-Header");
+        logging.MediaTypeOptions.AddText("application/javascript");
+        logging.RequestBodyLogLimit = 4096;
+        logging.ResponseBodyLogLimit = 4096;
+    });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -63,6 +78,8 @@ app.UseStatusCodePages();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.UseCors("AllowAll");
 
