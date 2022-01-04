@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModernPaper.Contexts;
 using ModernPaper.Models;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace ModernPaper.Controllers
 {
@@ -16,11 +17,29 @@ namespace ModernPaper.Controllers
     public class ArticlesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDistributedCache  _cache;
 
-        public ArticlesController(ApplicationDbContext context)
+        public ArticlesController(ApplicationDbContext context, IDistributedCache cache)
         {
             _context = context;
+            _cache = cache;
         }
+
+        // GET: api/Articles
+        [HttpGet("redis")]
+        public async Task<ActionResult<string>> GetRedisTest()
+        {
+            var hit = await _cache.GetStringAsync("redis");
+            if(hit is not null) return hit;
+
+            else
+            {
+                await _cache.SetStringAsync("redis", "Great Success!");
+                return "Hmmm, missed that one but I'll remember now!";
+            }
+
+        }
+
 
         // GET: api/Articles
         [HttpGet]

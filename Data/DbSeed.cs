@@ -55,8 +55,6 @@ namespace ModernPaper.Data
             {
                 new Article
                 {
-                    // CreatedAt = DateTime.UtcNow,
-                    // UpdatedAt = DateTime.UtcNow,
                     Title = "ASP.net Core, The Future of Microsoft and the Beauty of Open Source",
                     UserId = users.Single( i => i.Name == "John Smith").Id,
                     Keywords = new List<string> {"asp.net", "c#", "web framework", "open source"},
@@ -74,11 +72,11 @@ namespace ModernPaper.Data
                     Title = "How to move to the cloud (serverless) to save running costs and headaches",
                     UserId = users.Single( i => i.Name == "John Smith").Id,
                     Keywords = new List<string> {"cloud", "devops", "azure", "serverless", "aws"},
-                    Content = "Now not \"owning\" your server sounds scary but the world of serverless and its benefits is omnipresent within the modern tech stack. Ask any DevOps leader how much they've saved and how eager they are to go back to using a hammer for the computer and their head."
+                    Content = "Not \"owning\" your server sounds scary but the world of serverless and its benefits are omnipresent within the modern tech stack. Ask any DevOps leader how much they've saved and how eager they are to go back to using a hammer for the computer and their head."
                 },
                 new Article
                 {
-                    Title = "The ONE things you must know about React.js",
+                    Title = "The ONE thing you must know about React.js",
                     UserId = users.Single( i => i.Name == "John Smith").Id,
                     Keywords = new List<string> {"open source", "javascript", "js", "react", "react.js", "clickbait", "tips"},
                     Content = "React.js is super awesome and you totaly should look into it."
@@ -95,11 +93,6 @@ namespace ModernPaper.Data
             foreach (Article post in posts)
             {
                 context.Articles.Add(post);
-
-                // Map new post to users' list of Articles
-                // var UserId = users.Single( i => i.Name == "John Smith").Id;
-                // var theuser = context.Users.Single(a => a.Id == UserId);
-                // theuser.Articles.Append(post);
             }
 
             context.SaveChanges();

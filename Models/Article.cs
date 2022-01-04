@@ -10,7 +10,6 @@ namespace ModernPaper.Models
     public class Article
     {
         [Required]
-        // [Key]
         // [DefaultValue("gen_random_uuid()")]
         public int Id { get; set; }
 

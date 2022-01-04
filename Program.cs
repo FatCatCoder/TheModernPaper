@@ -1,16 +1,24 @@
-using Microsoft.EntityFrameworkCore;
 using ModernPaper.Contexts;
 using ModernPaper.Models;
 using ModernPaper.Services;
 using ModernPaper.Data;
-using Microsoft.AspNetCore.HttpLogging;
+using ModernPaper.Middleware;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpLogging;
+using StackExchange.Redis;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Caching;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
-// Add services to the container.
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // CORS
@@ -30,16 +38,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(DbContextOptions =>
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-// cache
+// -- Redis disabled while working on win7 due to unsupported version -- //
+
+// Add Redis distributed cache
+// builder.Services.AddStackExchangeRedisCache(options => options.Configuration = builder.Configuration.GetConnectionString("RedisConnection"));
+// builder.Services.AddStackExchangeRedisCache(opt => 
+//     opt.Configuration = "localhost:6379");
+
+// InMemory distributed cache Testing
 builder.Services.AddDistributedMemoryCache();
 
-// cookies
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromSeconds(10);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+// Res cache middleware
+builder.Services.AddResponseCaching();
+
+// cookie sessions
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie();
+
+// builder.Services.AddSession(options =>
+// {
+//     options.IdleTimeout = TimeSpan.FromSeconds(10);
+//     options.Cookie.HttpOnly = true;
+//     options.Cookie.IsEssential = true;
+// });
 
 // logging
 builder.Services.AddHttpLogging(logging =>
@@ -54,6 +75,10 @@ builder.Services.AddHttpLogging(logging =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -61,9 +86,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
-
-    // app.UseSwagger();
-    // app.UseSwaggerUI();
 }
  else
 {
@@ -72,20 +94,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpLogging();
-
 app.UseStatusCodePages();
-
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.UseSession();
-
+app.UseCookiePolicy();
 app.UseCors("AllowAll");
-
+app.UseAuthentication();
+app.UseAuthorization();
+// app.UseSession();
+// app.UseResponseCompression();
+// app.UseResponseCaching();
+app.UsePaywall();
 app.MapControllers();
 
 // Seed Database if Empty
 app.CreateDbIfNotExists();
-
 app.Run();
