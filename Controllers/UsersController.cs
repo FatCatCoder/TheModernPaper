@@ -13,47 +13,62 @@ namespace ModernPaper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ArticlesController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public ArticlesController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Articles
+        // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Article>>> GetArticles()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Articles.Include(x => x.User).ToListAsync();
+            return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Articles/5
+        // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Article>> GetArticle(int id)
+        public async Task<ActionResult<User>> GetUser(Guid id)
         {
-            var article = await _context.Articles.Include(y => y.User).Where(x => x.Id == id).FirstAsync();
+            var user = await _context.Users.FindAsync(id);
 
-            if (article == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return article;
+            return user;
         }
 
-        // PUT: api/Articles/5
+        // GET: api/Users/5/posts
+        // Gets the User and their related Articles
+        [HttpGet("{id}/posts")]
+        public async Task<ActionResult<User>> GetUserPosts(Guid id)
+        {
+            var user = await _context.Users.Include(x => x.Articles).SingleAsync(x => x.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
+
+        // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutArticle(int id, Article article)
+        public async Task<IActionResult> PutUser(Guid id, User user)
         {
-            if (id != article.Id)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(article).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +76,7 @@ namespace ModernPaper.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ArticleExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound();
                 }
@@ -74,36 +89,36 @@ namespace ModernPaper.Controllers
             return NoContent();
         }
 
-        // POST: api/Articles
+        // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Article>> PostArticle(Article article)
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Articles.Add(article);
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetArticle", new { id = article.Id }, article);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // DELETE: api/Articles/5
+        // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteArticle(int id)
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var article = await _context.Articles.FindAsync(id);
-            if (article == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Articles.Remove(article);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool ArticleExists(int id)
+        private bool UserExists(Guid id)
         {
-            return _context.Articles.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

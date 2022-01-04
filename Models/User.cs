@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace ModernPaper.Models
 {
@@ -22,14 +23,6 @@ namespace ModernPaper.Models
         [Required]
         public bool Pro { get; set; }
 
-        public ICollection<Article>? Articles { get; set; }
-
-        // public User(string name, string email, string password, bool pro)
-        // {
-        //     Name = name;
-        //     Email = email;
-        //     Password = password;
-        //     Pro = Pro;
-        // } 
+        public virtual ICollection<Article>? Articles { get; set; }
     }      
 }
